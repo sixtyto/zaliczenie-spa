@@ -1,6 +1,8 @@
+import React, { useEffect } from "react";
 import { Button } from "react-bootstrap";
-import type { Task } from "../App";
+import { Task, STATUSES } from "../App";
 import EditListItem from "./EditListItem";
+import { ListGroup } from "react-bootstrap";
 
 type Props = {
   addTask: (task: Task) => void;
@@ -9,25 +11,48 @@ type Props = {
   taskList: Task[];
 };
 
-const EditList = ({addTask, removeTask, editTask, taskList}: Props) => (
-  <>
-    <h1 className="mt-3">Edycja listy</h1>
-    <hr/>
-    <ul className="list-group">
-      {taskList.map(task => (
-        <EditListItem task={task} editTask={editTask}/>
-      ))}
-    </ul>
-    <div className="my-3">
-      <Button variant="outline-success" size="sm" onClick={() => addTask({
-        id: taskList.length + 1,
-        title: "",
-        description: "",
-        status: "Do zrobienia",
-        edit: true
-      })}>Dodaj zadanie</Button>
-    </div>
-  </>
-)
+function EditList({ addTask, removeTask, editTask, taskList }: Props) {
+  useEffect(() => {
+    return () => {
+      taskList.forEach((task) => {
+        editTask(task.id, { ...task, edit: false });
+      });
+    };
+  }, []);
+
+  return (
+    <>
+      <h1 className="mt-3">Edycja listy</h1>
+      <hr />
+      <ListGroup className="list-group">
+        {taskList.map((task) => (
+          <EditListItem
+            key={task.id}
+            task={task}
+            editTask={editTask}
+            removeTask={removeTask}
+          />
+        ))}
+      </ListGroup>
+      <div className="my-3">
+        <Button
+          variant="success"
+          size="sm"
+          onClick={() =>
+            addTask({
+              id: taskList.length + 1,
+              title: "",
+              description: "",
+              status: STATUSES.TODO,
+              edit: true,
+            })
+          }
+        >
+          Dodaj zadanie
+        </Button>
+      </div>
+    </>
+  );
+}
 
 export default EditList;
