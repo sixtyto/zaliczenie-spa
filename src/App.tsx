@@ -7,6 +7,7 @@ import About from "./components/About";
 import EditList from "./components/EditList";
 import NavBar from "./components/NavBar";
 import TaskList from "./components/TaskList";
+import { useLocation } from "react-router-dom";
 
 export type Task = {
   id: number;
@@ -23,6 +24,7 @@ export const STATUSES = {
 };
 
 const App = () => {
+  const location = useLocation();
   const [taskList, setTaskList] = useState([] as Task[]);
 
   const addTask = (task: Task) => {
@@ -75,6 +77,22 @@ const App = () => {
   useEffect(() => {
     localStorage.setItem("tasks", JSON.stringify(taskList));
   }, [taskList]);
+
+  useEffect(() => {
+    const cleanTaskList = taskList
+      .map((task) => {
+        if (task.title.length !== 0 && task.description.length !== 0) {
+          return {
+            ...task,
+            edit: false,
+          };
+        }
+      })
+      .filter((task) => task !== undefined);
+    if (cleanTaskList.length !== 0) {
+      setTaskList(cleanTaskList as Task[]);
+    }
+  }, [location]);
 
   return (
     <>
